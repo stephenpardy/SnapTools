@@ -1,0 +1,4 @@
+*.pyc
+snaptools/*.pyc
+build/
+.coverage

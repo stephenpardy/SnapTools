@@ -1,0 +1,4 @@
+[report]
+omit =
+    tests/*
+    snaptools/__init__.py
