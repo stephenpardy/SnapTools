@@ -7,6 +7,8 @@ notifications:
 
 before_install:
     - pip install coverage
+    - pip install pytest
+    - pip install pytest-cov
     - pip install h5py
     - pip install python-coveralls
 
