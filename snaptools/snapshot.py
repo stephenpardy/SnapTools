@@ -831,13 +831,15 @@ class Snapshot(object):
         id_file.close()
 
 
-    def save(self, fname, userblock_size=0):
-        import h5py
+    def save(self, fname, userblock_size=0,
+             part_names=['gas', 'halo', 'stars', 'bulge', 'sfr', 'other']):
         """
-        Save a snapshot object to an hdf5 file.
+        Save a snapshot object to an hdf5 file. Overload base case
         Note: Must have matching header and data.
         Todo: Gracefully handle mismatches between header and data
         """
+        import h5py
+
         # A list of header attributes, their key names, and data types
         head_attrs = {'npart': (np.int32, 'NumPart_ThisFile'),
                       'nall': (np.uint32, 'NumPart_Total'),
@@ -856,49 +858,48 @@ class Snapshot(object):
                       'metals': (np.int32, 'Flag_Metals'),
                       'feedback': (np.int32, 'Flag_Feedback'),
                       'double': (np.int32, 'Flag_DoublePrecision')}
-        misc_datablocks = {"U": "InternalEnergy",
-                           "RHO": "Density",
-                           "VOL": "Volume",
-                           "CMCE": "Center-of-Mass",
-                           "AREA": "Surface Area",
-                           "NFAC": "Number of faces of cell",
-                           "NE": "ElectronAbundance",
-                           "NH": "NeutralHydrogenAbundance",
-                           "HSML": "SmoothingLength",
-                           "SFR": "StarFormationRate",
-                           "AGE": "StellarFormationTime",
-                           "Z": "Metallicity",
-                           "ACCE": "Acceleration",
-                           "VEVE": "VertexVelocity",
-                           "FACA": "MaxFaceAngle",
-                           "COOR": "CoolingRate",
-                           "MACH": "MachNumber",
-                           "DMHS": "DM Hsml",
-                           "DMDE": "DM Density",
-                           "PTSU": "PSum",
-                           "DMNB": "DMNumNgb",
-                           "NTSC": "NumTotalScatter",
-                           "SHSM": "SIDMHsml",
-                           "SRHO": "SIDMRho",
-                           "SVEL": "SVelDisp",
-                           "GAGE": "GFM StellarFormationTime",
-                           "GIMA": "GFM InitialMass",
-                           "GZ": "GFM Metallicity",
-                           "GMET": "GFM Metals",
-                           "GMRE": "GFM MetalsReleased",
-                           "GMAR": "GFM MetalMassReleased"}
+        datablocks = {"pos": "Coordinates",
+                      "vel": "Velocities",
+                      "pot": "Potential",
+                      "masses": "Masses",
+                      "ids": "ParticleIDs",
+                      "U": "InternalEnergy",
+                      "RHO": "Density",
+                      "VOL": "Volume",
+                      "CMCE": "Center-of-Mass",
+                      "AREA": "Surface Area",
+                      "NFAC": "Number of faces of cell",
+                      "NE": "ElectronAbundance",
+                      "NH": "NeutralHydrogenAbundance",
+                      "HSML": "SmoothingLength",
+                      "SFR": "StarFormationRate",
+                      "AGE": "StellarFormationTime",
+                      "Z": "Metallicity",
+                      "ACCE": "Acceleration",
+                      "VEVE": "VertexVelocity",
+                      "FACA": "MaxFaceAngle",
+                      "COOR": "CoolingRate",
+                      "MACH": "MachNumber",
+                      "DMHS": "DM Hsml",
+                      "DMDE": "DM Density",
+                      "PTSU": "PSum",
+                      "DMNB": "DMNumNgb",
+                      "NTSC": "NumTotalScatter",
+                      "SHSM": "SIDMHsml",
+                      "SRHO": "SIDMRho",
+                      "SVEL": "SVelDisp",
+                      "GAGE": "GFM StellarFormationTime",
+                      "GIMA": "GFM InitialMass",
+                      "GZ": "GFM Metallicity",
+                      "GMET": "GFM Metals",
+                      "GMRE": "GFM MetalsReleased",
+                      "GMAR": "GFM MetalMassReleased"}
 
-        part_names = ['gas',
-                      'halo',
-                      'stars',
-                      'bulge',
-                      'sfr',
-                      'other']
         # Open the file
         with h5py.File(fname, 'w', userblock_size=userblock_size) as f:
             # First write the header
             grp = f.create_group('Header')
-            for key, val in self.header.items():
+            for key, val in iteritems(self.header):
                 # If we have a name and dtype, use those
                 if key in head_attrs.keys():
                     grp.attrs.create(head_attrs[key][1], val,
@@ -906,44 +907,24 @@ class Snapshot(object):
                 # Otherwise simply use the name we read in
                 else:
                     grp.attrs.create(key, val)
-            for i, n in enumerate(self.header['nall']):
-                if n > 0:
-                    p = part_names[i]
-                    grp = f.create_group('PartType'+str(i))
-                    dset = grp.create_dataset('Coordinates',
-                                              self.pos[p].shape
-                                              )
-                    dset[:] = self.pos[p]
-                    dset = grp.create_dataset('Velocities',
-                                              self.vel[p].shape
-                                              )
-                    dset[:] = self.vel[p]
-                    dset = grp.create_dataset('ParticleIDs',
-                                              self.ids[p].shape,
-                                              dtype='i4')
-                    dset[:] = self.ids[p]
-                    dset = grp.create_dataset('Masses',
-                                              self.masses[p].shape
-                                              )
-                    dset[:] = self.masses[p]
+            # create the groups for all particles in the snapshot
+            grps = [f.create_group('PartType{:d}'.format(i))  if n > 0 else None
+                    for i, n in enumerate(self.header['nall'])]
+            # iterate through datablocks first
 
-                    if p in self.pot:
-                        dset = grp.create_dataset('Potential',
-                                                  self.pot[p].shape
-                                                 )
-                        dset[:] = self.pot[p]
+            for attr_name, attr in iteritems(self.__dict__):
+                x = getattr(attr, 'states', None)
+                if (x is None) and (attr_name not in datablocks):  # only want lazy-dict things
+                    continue
+                for p, val in iteritems(attr):  # then through particle types
 
-                    if p in self.misc.keys():  # Check for any misc data
-                        for k in self.misc[p].keys():  # Loop through all misc data we have
-                            if k.rstrip() in misc_datablocks.keys():
-                                name = misc_datablocks[k]
-                            else:
-                                name = k
-                            dset = grp.create_dataset(name,
-                                                      self.misc[p]
-                                                      [k].shape
-                                                      )
-                            dset[:] = self.misc[p][k]
+                    i = part_names.index(p)
+                    try:
+                        dset = grps[i].create_dataset(datablocks[attr_name], val.shape,
+                                                      dtype=val.dtype)
+                    except KeyError:
+                        dset = grps[i].create_dataset(attr_name, val.shape, dtype=val.dtype)
+                    dset[:] = val
 
 
     def write_csv(self, gal_num=-1, ptypes=['stars'], stepsize=100, columns=['pos', 'vel']):
