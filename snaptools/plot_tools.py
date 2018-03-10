@@ -1,8 +1,5 @@
-from __future__ import print_function, absolute_import, division
-from builtins import range  # overload range to ensure python3 style
 import matplotlib
 matplotlib.use('AGG')
-from .CBcm import make_color_maps
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.cm as cm
@@ -85,10 +82,8 @@ def plot_single(name,
                                        ylen = ylen,
                                        zlen = zlen)
 
-    try:
-        settings['colormap'] = make_color_maps()[0][colormap]
-    except KeyError:
-        settings['colormap'] = colormap
+
+    settings['colormap'] = colormap
 
     settings['colorbar'] = colorbar
     settings['NBINS'] = NBINS
@@ -192,10 +187,8 @@ def plot_loop(snaps,
                                        zlen=zlen,
                                        colorbar=colorbar,
                                        NBINS=NBINS)
-    try:
-        settings['colormap'] = make_color_maps()[0][colormap]
-    except KeyError:
-        settings['colormap'] = colormap
+
+    settings['colormap'] = colormap
 
     part_names = ['gas',
                   'halo',
@@ -317,9 +310,6 @@ def plot_stars(binDict,
     panels = settings['panel_mode']
     scale = settings['log_scale']
     cbarmode = settings['colorbar']
-    co = utils.Conversions(UnitMass_in_g=settings['UnitMass_in_g'],
-                           UnitVelocity_in_cm_per_s=settings['UnitVelocity_in_cm_per_s'],
-                           UnitLength_in_cm=settings['UnitLength_in_cm'])
 
 #for mass weighted histogram
 #size in units of scale length
@@ -349,7 +339,7 @@ def plot_stars(binDict,
                      textcoords='axes fraction',
                      xytext=(.5, .8), fontsize='larger')
 
-        fig.suptitle("t="+str(round(snaptime*co.UnitTime_in_Gyr*1000.0, 1)) +
+        fig.suptitle("t="+str(round(snaptime, 1)) +
                      "Myr", fontsize=25)
 
     if panels == "three":
@@ -374,7 +364,7 @@ def plot_stars(binDict,
         ax3.set_xlabel('Y [kpc]', fontsize=15)
         ax3.set_ylabel('Z [kpc]', fontsize=15)
 
-        fig.suptitle("t="+str(round(snaptime*co.UnitTime_in_Gyr*1000.0, 1)) +
+        fig.suptitle("t="+str(round(snaptime, 1)) +
                      "Myr", fontsize=25)
 
     if panels == "xy":
@@ -394,7 +384,7 @@ def plot_stars(binDict,
 
         im = plot_panel(grid[0], 'Z2', binDict, settings, axes=[0, 1])
 
-        fig.suptitle("t="+str(round(snaptime*co.UnitTime_in_Gyr*1000.0, 1)) +
+        fig.suptitle("t="+str(round(snaptime, 1)) +
                      "Myr", fontsize=25)
 
         cbar = grid.cbar_axes[0].colorbar(im)
@@ -435,7 +425,7 @@ def plot_stars(binDict,
         ax_y.get_yaxis().set_visible(False)
         ax_y.set_xlabel('Z [kpc]', fontsize=25)
 
-        fig.suptitle("t="+str(round(snaptime*co.UnitTime_in_Gyr*1000.0, 1)) +
+        fig.suptitle("t="+str(round(snaptime, 1)) +
                      "Myr", fontsize=25)
 
     if not returnOnly:

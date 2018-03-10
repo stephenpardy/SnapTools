@@ -55,9 +55,7 @@ class Snapshot(object):
                     return snapclass
             else:
                 raise RuntimeError("Filetype is not HDF5. Other file types are not implemented in this version of SnapTools.")
-                snapclass = super(Snapshot, cls).__new__(snapshot_io.SnapBinary)
-                snapclass.init(curfilename)  # replaces standard __init__ method
-                return snapclass
+
         else:
             return super(Snapshot, cls).__new__(cls)
 

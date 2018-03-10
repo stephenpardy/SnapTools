@@ -20,10 +20,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 EXCEPTIONS:
 1)
 EllipseFitter.py originally obtained from https://pypi.python.org/pypi/EllipseFitter/
-Licensed under BSD and written by David Mashburn. Redistributed here with slightl modifications by permission of Author.
+Licensed under BSD and written by David Mashburn. Redistributed here with slight modifications by permission of Author.
 
 2)
-lazydict.py originally obtained from https://github.com/janrain/lazydict and redistributed here with slight modification. Original license below.
+lazydict.py originally obtained from https://github.com/janrain/lazydict and redistributed here with slight modifications. Original license below.
 
 Copyright (c) 2014 Janrain, Inc.
 
