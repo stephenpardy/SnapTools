@@ -4,3 +4,5 @@ build/
 .coverage
 .pytest_cache
 tests/galaxies1.hdf5
+*.png
+*.pdf

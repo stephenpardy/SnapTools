@@ -15,8 +15,11 @@ PyPI distro coming soon.
 ## Requires:
 
 numpy>=1.10.0
+
 matplotlib
+
 multiprocess
+
 h5py
 
 ## How to use:

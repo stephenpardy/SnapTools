@@ -32,7 +32,7 @@ def plot_single(name,
                 plotPotMin=False,
                 first_only=False,
                 gal_num=-1,
-                colormap='BuOr',
+                colormap='viridis',
                 xlen=20,
                 ylen=20,
                 zlen=20,
@@ -95,23 +95,23 @@ def plot_single(name,
                   'sfr',
                   'other']
 
-    if type(parttype) == list:
-        print("Must choose one particle type")
-        return 0
-    if type(parttype) == int:
+    if ((getattr(parttype, '__iter__', None) is not None) and  # add additional check due to python3
+            (not isinstance(parttype, (str, bytes)))):
+        raise RuntimeError("Must choose one particle type")
+
+    elif isinstance(parttype, int):
         if parttype > -1:
             settings['parttype'] = part_names[parttype]
         else:
-            print("Must choose one particle type")
-            return 0
-    elif type(parttype) == str:
+            raise RuntimeError("Must choose one particle type")
+
+    elif isinstance(parttype, str):
         if parttype in part_names:
             settings['parttype'] = parttype
     else:
-        print("Not a valid particle type")
-        return 0
+        raise RuntimeError("Not a valid particle type")
 
-    plot_stars(snapshot.Snapshot(fname).bin_snap(settings), outname, settings)
+    return plot_stars(snapshot.Snapshot(fname).bin_snap(settings), outname, settings)
 
 
 def plot_loop(snaps,
@@ -126,7 +126,7 @@ def plot_loop(snaps,
               gal_num=-1,
               first_only=False,
               plotCompanionCOM=False,
-              colormap='BuOr',
+              colormap='viridis',
               xlen=20,
               ylen=20,
               zlen=20,
@@ -197,21 +197,21 @@ def plot_loop(snaps,
                   'sfr',
                   'other']
 
-    if hasattr(parttype, '__iter__'):
-        print("Must choose one particle type")
-        return 0
+    if ((getattr(parttype, '__iter__', None) is not None) and  # add additional check due to python3
+            (not isinstance(parttype, (str, bytes)))):
+        raise RuntimeError("Must choose one particle type")
+
     elif isinstance(parttype, int):
         if parttype > -1:
             settings['parttype'] = part_names[parttype]
         else:
-            print("Must choose one particle type")
-            return 0
+            raise RuntimeError("Must choose one particle type")
+
     elif isinstance(parttype, str):
         if parttype in part_names:
             settings['parttype'] = parttype
     else:
-        print("Not a valid particle type")
-        return 0
+        raise RuntimeError("Not a valid particle type")
 
     # Turn list of snapnumbers into names if not already
     snaps = utils.list_snapshots(snaps, folder, snapbase)
@@ -219,12 +219,18 @@ def plot_loop(snaps,
     for i, s in enumerate(snaps):
         settings_array.append(settings.copy())
         settings_array[i]['filename'] = s
-        n = re.search(snapbase+'([0-9]{3})', s).group(1)
+
+        m = re.search(snapbase+'([0-9]+)', s)
+        if m is not None:
+            n = m.group(1)
+        else:
+            n = str(i)
+
         settings_array[i]['outputname'] = output_name + n + ".png"
 
     pool = Pool()
-    pool.map(plot_stars_helper, settings_array)
-
+    figs = pool.map(plot_stars_helper, settings_array)
+    return figs
 
 def plot_stars_helper(settings):
     """
@@ -236,7 +242,7 @@ def plot_stars_helper(settings):
     if snap is None:
       raise IOError("Snapshot {:s} not found.".format(fname))
 
-    plot_stars(snap.bin_snap(settings), outname, settings)
+    return plot_stars(snap.bin_snap(settings), outname, settings)
 
 
 def plot_panel(axis, perspective, bin_dict, settings, axes=[0, 1]):
@@ -852,6 +858,7 @@ def plot_contours(bin_dict,
 
 
 def plot_orbit(sims, names, styles=['-'],
+               indices=None,
                colors=['#332288'],
                output='./',
                axes=None):
@@ -862,22 +869,22 @@ def plot_orbit(sims, names, styles=['-'],
     sims, names = utils.check_args(sims, names)
 
     if axes is None:
-      fig, ax = plt.subplots(2, 1, figsize=(5,10), sharex=True)
+        fig, ax = plt.subplots(2, 1, figsize=(5,10), sharex=True)
     else:
-      ax = axes
+        ax = axes
 
     for sim, name, color, style in zip(sims, names, cycle(colors), cycle(styles)):
-        distances, velocities, times = sim.measure_separation()
+        distances, velocities, times = sim.measure_separation(indices=indices)
 
         ax[0].plot(times, distances, style, color=color, label=name)
         ax[1].plot(times, velocities, style, color=color, label=name)
 
     if axes is None:
-      ax[0].set_ylabel('Separation [kpc]')
-      ax[1].set_ylabel('Relative Velocity (km s$^{-1}$)')
-      ax[1].set_xlabel('Time (Gyr)')
-      ax[0].legend()
-      ax[1].legend()
-      plt.savefig(output+'orbits.pdf', dpi=600)
-      plt.clf()
-      plt.close()
+        ax[0].set_ylabel('Separation [kpc]')
+        ax[1].set_ylabel('Relative Velocity (km s$^{-1}$)')
+        ax[1].set_xlabel('Time (Gyr)')
+        ax[0].legend()
+        ax[1].legend()
+        plt.savefig(output+'orbits.pdf', dpi=600)
+        plt.clf()
+        plt.close()
