@@ -2,3 +2,4 @@
 snaptools/*.pyc
 build/
 .coverage
+.pytest_cache
