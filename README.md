@@ -31,6 +31,6 @@ print(snap.pos['stars'].mean(axis=0))  # get a rough center of mass of the simul
 Updated tutorials coming soon. In the meantime, see https://github.com/stephenpardy/Offsets_Notebooks for some older examples (not all may work with this version).
 
 TODO
-[ ] 100% testing
-[ ] Add better plotting methods
-[ ] Add interface to YT.
+- [ ] 100% testing
+- [ ] Add better plotting methods
+- [ ] Add interface to YT.
