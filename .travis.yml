@@ -8,6 +8,7 @@ notifications:
 before_install:
     - pip install coverage
     - pip install h5py
+    - pip install python-coveralls
 
 install:
     - python setup.py install
@@ -15,3 +16,5 @@ install:
 script:
     - python tests/test_load.py
     - python tests/test_ellipse_fit.py
+    - coverage report
+    - coveralls
