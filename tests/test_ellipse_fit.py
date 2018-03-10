@@ -1,5 +1,3 @@
-from __future__ import print_function, absolute_import, division
-import unittest
 import numpy as np
 from snaptools import EllipseFitter
 
@@ -7,8 +5,10 @@ from snaptools import manipulate as man
 from snaptools import utils
 from snaptools import snapshot
 
-class BaseEllipseCase(unittest.TestCase):
-    def setUp(self):
+class TestSnapshot():
+
+    @classmethod
+    def setup_class(self):
 
         N = 10000
 
@@ -50,8 +50,7 @@ class BaseEllipseCase(unittest.TestCase):
         self.NBINS = NBINS
 
 
-class SingleEllipseTest(BaseEllipseCase):
-    def runTest(self):
+    def test_single_ellipse(self):
 
         settings = utils.make_settings(xlen=self.xlen, ylen=self.ylen, NBINS=self.NBINS,
                                        log_scale=False, in_min=1, in_max=3,
@@ -60,7 +59,3 @@ class SingleEllipseTest(BaseEllipseCase):
                                            numcontours=1, plot=False,
                                            return_im=False)
         assert np.allclose(cent_dict['diskCenters'], self.true_centers, atol=0.5)
-
-
-if __name__ == '__main__':
-    unittest.main()
