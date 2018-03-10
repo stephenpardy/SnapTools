@@ -11,6 +11,8 @@ before_install:
     - pip install pytest-cov
     - pip install h5py
     - pip install python-coveralls
+    - pip install matplotlib
+    - pip install multiprocess
 
 install:
     - python setup.py install
