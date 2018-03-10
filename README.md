@@ -7,8 +7,9 @@ Bespoke tools for working with isolated or interacting galaxy snapshots produced
 Does not work for Cosmological snapshots.
 
 ## Install:
-
+```
 pip install git+https://github.com/stephenpardy/SnapTools.git
+```
 PyPI distro coming soon.
 
 ## Requires:
