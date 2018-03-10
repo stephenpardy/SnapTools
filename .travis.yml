@@ -14,7 +14,6 @@ install:
     - python setup.py install
 
 script:
-    - python tests/test_load.py
-    - python tests/test_ellipse_fit.py
-    - coverage report
+    - coverage run tests/test_load.py
+    - coverage run tests/test_ellipse_fit.py
     - coveralls
