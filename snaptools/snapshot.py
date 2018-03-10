@@ -899,7 +899,7 @@ class Snapshot(object):
         with h5py.File(fname, 'w', userblock_size=userblock_size) as f:
             # First write the header
             grp = f.create_group('Header')
-            for key, val in iteritems(self.header):
+            for key, val in self.header.items():
                 # If we have a name and dtype, use those
                 if key in head_attrs.keys():
                     grp.attrs.create(head_attrs[key][1], val,
@@ -912,11 +912,11 @@ class Snapshot(object):
                     for i, n in enumerate(self.header['nall'])]
             # iterate through datablocks first
 
-            for attr_name, attr in iteritems(self.__dict__):
+            for attr_name, attr in self.__dict__.items():
                 x = getattr(attr, 'states', None)
                 if (x is None) and (attr_name not in datablocks):  # only want lazy-dict things
                     continue
-                for p, val in iteritems(attr):  # then through particle types
+                for p, val in attr.items():  # then through particle types
 
                     i = part_names.index(p)
                     try:

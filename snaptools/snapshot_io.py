@@ -135,7 +135,7 @@ class SnapLazy(Snapshot):
                         except KeyError:
                             attr_name = key
                         if attr_name not in self.__dict__.keys():
-                            self.__dict__[attr_name] = lazydict.LazyDictionary()
+                            self.__dict__[attr_name] = lazydict.MutableLazyDictionary()
                         self.__dict__[attr_name][part] = partial(load_dataset, self.filename,
                                                                  "PartType%d" % i, key)
 

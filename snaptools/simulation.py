@@ -26,7 +26,7 @@ class Simulation(object):
         # Default behavior is to collect everything that matches the snapbase
         if snaps is None:
             self.snaps = [folder+f for f in os.listdir(folder)
-                            if re.search("^"+snapbase+"[0-9]{3}.*\.%s$" % snapext, f)]
+                            if re.search("^"+snapbase+"[0-9]+.*\.%s$" % snapext, f)]
             self.snaps = np.sort(self.snaps)
         #otherwise will use only certain range or given numbers
         else:

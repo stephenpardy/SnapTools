@@ -9,9 +9,9 @@ class TestSnapshot():
         """ setup any state specific to the execution of the given class (which
         usually contains tests).
         """
-        self.snap = snapshot.Snapshot('tests/galaxies.hdf5')
+        self.snap = snapshot.Snapshot('tests/galaxies0.hdf5')
         if self.snap is None:
-            raise IOError('Must have the file galaxies.hdf5')
+            raise IOError('Must have the file galaxies0.hdf5')
 
 
     def test_header(self):

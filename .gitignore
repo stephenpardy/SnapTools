@@ -3,3 +3,4 @@ snaptools/*.pyc
 build/
 .coverage
 .pytest_cache
+tests/galaxies1.hdf5
