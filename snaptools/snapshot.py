@@ -374,10 +374,6 @@ class Snapshot(object):
         return x_pot, y_pot, z_pot
 
 
-    def get_stripped_particles(self):
-        pass
-
-
     def bin_snap(self, settings=None):
         """
         Create 2D density projection of snapshot in one or more projections.

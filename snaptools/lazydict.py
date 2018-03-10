@@ -3,7 +3,7 @@ from threading import RLock
 from inspect import getargspec
 from copy import copy
 
-def get_version():
+def get_version(): # pragma: no cover
     VERSION = (     # SEMANTIC
         1,          # major
         0,          # minor

@@ -86,7 +86,13 @@ def loop_centers(snaps,
     for i, s in enumerate(snaps):
         settings_array.append(settings.copy())
         settings_array[i]['filename'] = s
-        n = re.search(snapbase+'([0-9]{3})', s).group(1)
+        m = re.search(snapbase+'([0-9]+)', s)
+
+        if m is not None:
+            n = m.group(1)
+        else:
+            n = str(i)
+
         settings_array[i]['outputname'] = output + n + 'distances'
 
     nsnaps = len(snaps)
@@ -99,7 +105,7 @@ def loop_centers(snaps,
         print('got ^C while pool mapping, terminating the pool')
         pool.terminate()
         print('pool is terminated')
-    except exception as e:
+    except Exception as e:
         print('got exception: %r, terminating the pool' % (e,))
         pool.terminate()
         print('pool is terminated')
@@ -215,7 +221,7 @@ def loop_fourier(snaps,
         print('got ^C while pool mapping, terminating the pool')
         pool.terminate()
         print('pool is terminated')
-    except exception as e:
+    except Exception as e:
         print('got exception: %r, terminating the pool' % (e,))
         pool.terminate()
         print('pool is terminated')

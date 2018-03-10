@@ -3,6 +3,7 @@ from . import utils
 from . import plot_tools
 from . import measure
 from . import snapshot
+from functools import partial
 from multiprocess import Pool
 import itertools
 import numpy as np
@@ -91,47 +92,56 @@ class Simulation(object):
         time_end = snap.header['time']
 
 
-    def measure_centers_of_mass(self):
+    def measure_centers_of_mass(self, indices=None):
         """
         Get the center of masses of the galaxies in the snapshots.
         """
-        def center_of_mass(snapname):
+        def center_of_mass_(snapname, indices=None):
             try:
                 snap = snapshot.Snapshot(snapname)
-                com1s, com2s, idgals, idgal2s = snap.center_of_mass('stars')
+                if indices is None:
+                    indices = snap.split_galaxies('stars')
+                com1s, com2s = snap.measure_com('stars', indices)
                 return com1s
             except KeyboardInterrupt:
                 pass
 
+        center_of_mass = partial(center_of_mass_, indices=indices)
         return np.array(self.apply_function(center_of_mass))
 
 
-    def measure_separation(self):
+    def measure_separation(self, indices=None):
         """
         Get relative velocity and radial separation between two galaxies.
         """
-        def centers(snapname):
+        def centers_(snapname, indices=None):
             try:
                 snap = snapshot.Snapshot(snapname)
-                com1, com2, gal1id, gal2id = snap.center_of_mass('stars')
-                v1 = snap.vel['stars'][gal1id, :].mean(axis=0)
-                v2 = snap.vel['stars'][gal2id, :].mean(axis=0)
+                if indices is None:
+                    indices = snap.split_galaxies('stars')
+                coms = snap.measure_com('stars', indices)
+                v1 = snap.vel['stars'][indices[0], :].mean(axis=0)
+                v2 = snap.vel['stars'][indices[1], :].mean(axis=0)
                 time = snap.header['time']
-                return [com1, com2, v1, v2, time]
+                return [coms[0], coms[1], v1, v2, time]
             except KeyboardInterrupt:
                 pass
 
-        cents = np.array(self.apply_function(centers))
+
+        centers = partial(centers_, indices=indices)
+        cents = self.apply_function(centers)
         nsnaps = len(self.snaps)
 
         distances = np.empty(nsnaps)
         velocities = np.empty(nsnaps)
+        times = np.empty(nsnaps)
 
         for i, cent in enumerate(cents):
             distances[i] = np.sqrt(np.sum( (cent[0] - cent[1])**2 ))
             velocities[i] = np.sqrt(np.sum( (cent[2] - cent[3])**2 ))
+            times[i] = cent[4]
 
-        return distances, velocities, cents[:, 4]
+        return distances, velocities, times
 
 
     def apply_function(self, function, *args):
@@ -148,7 +158,7 @@ class Simulation(object):
             print('got ^C while pool mapping, terminating the pool')
             pool.terminate()
             print('pool is terminated')
-        except exception as e:
+        except Exception as e:
             print('got exception: %r, terminating the pool' % (e,))
             pool.terminate()
             print('pool is terminated')
@@ -172,7 +182,7 @@ class Simulation(object):
             self.settings[name] = val
 
 
-    def get_snapshot(self, num=None, lazy=False):
+    def get_snapshot(self, num=None, lazy=True):
         """
         Return snapshot
         """

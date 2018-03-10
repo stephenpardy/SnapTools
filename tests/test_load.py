@@ -22,6 +22,11 @@ class TestSnapshot():
             assert np.allclose(val, self.snap.header[key])
 
 
+    def test_settings(self):
+        self.snap.set_settings(halo_center_method='com')
+        assert self.snap.settings['halo_center_method'] == 'com'
+
+
     def test_split(self):
         indices = self.snap.split_galaxies('stars')
         assert len(indices) == 1
