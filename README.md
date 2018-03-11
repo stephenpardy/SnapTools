@@ -22,6 +22,8 @@ multiprocess
 
 h5py
 
+scipy
+
 ## How to use:
 
 ```python

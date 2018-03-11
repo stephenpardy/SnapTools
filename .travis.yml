@@ -6,6 +6,7 @@ notifications:
   email: false
 
 before_install:
+    - pip install scipy
     - pip install coverage
     - pip install pytest
     - pip install pytest-cov
