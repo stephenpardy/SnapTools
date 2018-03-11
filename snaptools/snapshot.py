@@ -1,5 +1,6 @@
 from . import manipulate as man
 from . import utils
+from scipy import stats
 import numpy as np
 import copy
 import warnings
@@ -744,8 +745,11 @@ class Snapshot(object):
                                                             bins=n)
         avg_brightness = np.cumsum(stat)/(np.arange(n) + 1)
 
-        brighter_pixels = np.where(avg_brightness*0.2-stat > 0)[0]
+        brighter_pixels, = np.where(avg_brightness*0.2-stat > 0)
         #rp = bin_edges[brighter_pixels[0]]
+        if len(brighter_pixels) == 0:
+            raise RuntimeError("No bright pixels.")
+
         mu_rp = stat[brighter_pixels[0]]
 
         surface_density = self.bin_dict['Z2']

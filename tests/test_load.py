@@ -40,3 +40,27 @@ class TestSnapshot():
         assert np.allclose(com[0], [-9.39480209e+01,  -3.41116142e+01,  -1.63059831e-02])
         assert np.allclose(com[1], [9.40026627e+01,   3.41231651e+01,  -5.44914752e-02])
 
+
+    def test_anisotropy(self):
+        #assert self.snap.velocity_anisotropy('stars') is not np.nan
+        pass
+
+
+    def test_measure_concentration(self):
+        #assert self.snap.measure_concentration() is not np.nan
+        pass
+
+
+    def test_measure_asymmetry(self):
+        #assert self.snap.measure_asymmetry() is not np.nan
+        pass
+
+
+    def test_measure_gini(self):
+        #assert self.snap.measure_gini() is not np.nan
+        pass
+
+
+    def test_measure_m20(self):
+        #assert self.snap.measure_m20() is not np.nan
+        pass
